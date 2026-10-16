@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Cảnh báo Thiên tai & Cứu hộ Khẩn cấp Đường dốc núi</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+
+    <!-- Header -->
+    <header class="bg-slate-800 border-b border-slate-700 shadow-lg py-4 px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+            <div class="bg-red-600 text-white p-3 rounded-xl shadow-md animate-pulse">
+                <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-wide">TRUNG TÂM GIÁM SÁT CỨU HỘ KHẨN CẤP</h1>
+                <p class="text-xs text-slate-400">Khu vực tuyến đường dốc núi hiểm trở</p>
+            </div>
+        </div>
+        <div id="system-status" class="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-700 text-sm font-medium">
+            <span class="w-3 h-3 rounded-full bg-yellow-500 animate-ping"></span>
+            <span>Đang kết nối Firebase...</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Cột hiển thị trạng thái cảm biến -->
+        <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 content-start">
+
+            <!-- Card 1: Cảm biến Khói / Cháy rừng -->
+            <div id="card-smoke" class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl transition-all duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-orange-500/20 text-orange-400 rounded-xl">
+                        <i class="fa-solid fa-fire text-2xl"></i>
+                    </div>
+                    <span id="badge-smoke" class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">BÌNH THƯỜNG</span>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-200">Cảm biến Khói (Cháy Rừng)</h3>
+                <p class="text-xs text-slate-400 mt-1">Giám sát nồng độ khói và khí cháy dọc tuyến đường.</p>
+                <div class="mt-6 pt-4 border-t border-slate-700/60 flex justify-between items-center text-sm">
+                    <span class="text-slate-400">Trạng thái tín hiệu:</span>
+                    <span id="val-smoke" class="font-bold text-emerald-400 text-base">1 (An toàn)</span>
+                </div>
+            </div>
+
+            <!-- Card 2: Cảm biến Rung / Sạt lở -->
+            <div id="card-vibration" class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl transition-all duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-amber-500/20 text-amber-400 rounded-xl">
+                        <i class="fa-solid fa-mountain text-2xl"></i>
+                    </div>
+                    <span id="badge-vibration" class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">BÌNH THƯỜNG</span>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-200">Cảm biến Rung (Sạt Lở Đất)</h3>
+                <p class="text-xs text-slate-400 mt-1">Phát hiện địa chất rung lắc, dịch chuyển mái ta-luy.</p>
+                <div class="mt-6 pt-4 border-t border-slate-700/60 flex justify-between items-center text-sm">
+                    <span class="text-slate-400">Trạng thái tín hiệu:</span>
+                    <span id="val-vibration" class="font-bold text-emerald-400 text-base">0 (Ổn định)</span>
+                </div>
+            </div>
+
+            <!-- Card 3: Nút nhấn Khẩn cấp SOS -->
+            <div id="card-sos" class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl transition-all duration-300 md:col-span-2">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-red-500/20 text-red-500 rounded-xl">
+                        <i class="fa-solid fa-hand-holding-medical text-2xl"></i>
+                    </div>
+                    <span id="badge-sos" class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">SẴN SÀNG</span>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-200">Nút Nhấn Cứu Hộ Khẩn Cấp (Tai nạn giao thông)</h3>
+                <p class="text-xs text-slate-400 mt-1">Tín hiệu gọi cứu trợ khẩn cấp từ các trạm dừng chân hoặc người tham gia giao thông trên đèo.</p>
+                <div class="mt-6 pt-4 border-t border-slate-700/60 flex justify-between items-center text-sm">
+                    <span class="text-slate-400">Trạng thái yêu cầu:</span>
+                    <span id="val-sos" class="font-bold text-emerald-400 text-base">Không có yêu cầu</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Cột điều khiển còi báo động & Xác nhận cứu hộ -->
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl flex flex-col h-full">
+            <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                <i class="fa-solid fa-bell text-yellow-400"></i> Điều khiển Còi & Xử lý
+            </h3>
+            <p class="text-xs text-slate-400 mb-4">Còi xe cứu hỏa sẽ hú liên tục khi có sự cố. Chỉ dừng lại khi nhân viên ấn xác nhận hoàn tất cứu hộ.</p>
+            
+            <!-- Nút xác nhận cứu hộ thành công -->
+            <button onclick="resolveEmergency()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-lg mb-4 cursor-pointer">
+                <i class="fa-solid fa-circle-check text-lg"></i> 
+                <span>Xác nhận Cứu hộ thành công</span>
+            </button>
+
+            <!-- Nút bật/tắt tiếng còi thủ công -->
+            <button id="btn-mute" onclick="toggleMute()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-medium py-2.5 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 shadow-inner mb-6">
+                <i class="fa-solid fa-volume-high text-green-400" id="icon-mute"></i> 
+                <span id="text-mute">Âm thanh còi: Đang bật</span>
+            </button>
+
+            <!-- Nhật ký sự kiện -->
+            <h4 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left"></i> Nhật ký sự cố hệ thống
+            </h4>
+            <div id="log-container" class="bg-slate-900/80 border border-slate-700/80 rounded-xl p-3 flex-1 overflow-y-auto max-h-[250px] text-xs space-y-2 font-mono">
+                <div class="text-slate-500 italic">Hệ thống khởi động, đang chờ dữ liệu...</div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 text-xs text-slate-500 border-t border-slate-800 mt-auto">
+        Hệ thống Tự động hóa Cảnh báo Thiên tai & Cứu hộ Đèo dốc &copy; 2026
+    </footer>
+
+    <!-- Firebase SDK v10 (Modular) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            databaseURL: "https://esp32-pro-820cf-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Biến quản lý âm thanh còi xe cứu hỏa (Fire Engine Wail Siren)
+        let audioCtx = null;
+        let oscillator = null;
+        let gainNode = null;
+        let fireSirenTimer = null;
+        let isAlarmActive = false;
+        let userMuted = false;
+        let alarmLocked = false; 
+
+        window.toggleMute = function() {
+            userMuted = !userMuted;
+            const btnText = document.getElementById("text-mute");
+            const btnIcon = document.getElementById("icon-mute");
+            if (userMuted) {
+                btnText.innerText = "Âm thanh còi: Đã tắt tiếng";
+                btnIcon.className = "fa-solid fa-volume-xmark text-red-400";
+                stopFireSiren();
+            } else {
+                btnText.innerText = "Âm thanh còi: Đang bật";
+                btnIcon.className = "fa-solid fa-volume-high text-green-400";
+                if (isAlarmActive || alarmLocked) startFireSiren();
+            }
+        }
+
+        window.resolveEmergency = function() {
+            alarmLocked = false;
+            isAlarmActive = false;
+            stopFireSiren();
+            addLog("✅ Đã xác nhận cứu hộ thành công / Xử lý xong sự cố. Hệ thống trở lại bình thường.", "success");
+            
+            resetCardUI('smoke');
+            resetCardUI('vibration');
+            resetCardUI('sos');
+        }
+
+        // Mô phỏng tiếng còi hú đặc trưng của xe cứu hỏa (Wail: tăng từ trầm lên bổng rất sâu, rồi hạ xuống)
+        function startFireSiren() {
+            if (userMuted) return;
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            if (!oscillator) {
+                try {
+                    oscillator = audioCtx.createOscillator();
+                    gainNode = audioCtx.createGain();
+                    
+                    // Sử dụng dạng sóng 'sawtooth' để tạo độ rền vang đặc trưng của xe ưu tiên
+                    oscillator.type = 'sawtooth';
+                    oscillator.frequency.setValueAtTime(350, audioCtx.currentTime);
+
+                    let rising = true;
+                    // Chu kỳ còi xe cứu hỏa kéo dài khoảng 2 giây cho một nhịp lên/xuống trầm ấm
+                    fireSirenTimer = setInterval(() => {
+                        if (oscillator && audioCtx) {
+                            let targetFreq = rising ? 1100 : 350;
+                            oscillator.frequency.linearRampToValueAtTime(targetFreq, audioCtx.currentTime + 1.2);
+                            rising = !rising;
+                        }
+                    }, 1200);
+
+                    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    oscillator.start();
+                } catch(e) {
+                    console.log("Audio play error:", e);
+                }
+            }
+        }
+
+        function stopFireSiren() {
+            if (fireSirenTimer) {
+                clearInterval(fireSirenTimer);
+                fireSirenTimer = null;
+            }
+            if (oscillator) {
+                try {
+                    oscillator.stop();
+                    oscillator.disconnect();
+                    oscillator = null;
+                } catch(e) {}
+            }
+        }
+
+        function addLog(message, type = 'info') {
+            const container = document.getElementById("log-container");
+            const timeStr = new Date().toLocaleTimeString('vi-VN');
+            let colorClass = "text-slate-300";
+            if (type === 'danger') colorClass = "text-red-400 font-bold";
+            if (type === 'warning') colorClass = "text-orange-400 font-semibold";
+            if (type === 'success') colorClass = "text-emerald-400 font-bold";
+
+            const div = document.createElement("div");
+            div.className = colorClass;
+            div.innerHTML = `[${timeStr}] ${message}`;
+            container.prepend(div);
+        }
+
+        function resetCardUI(type) {
+            if (type === 'smoke') {
+                document.getElementById("card-smoke").className = "bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl transition-all duration-300";
+                document.getElementById("badge-smoke").className = "px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                document.getElementById("badge-smoke").innerText = "BÌNH THƯỜNG";
+                document.getElementById("val-smoke").className = "font-bold text-emerald-400 text-base";
+                document.getElementById("val-smoke").innerText = "1 (An toàn)";
+            } else if (type === 'vibration') {
+                document.getElementById("card-vibration").className = "bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl transition-all duration-300";
+                document.getElementById("badge-vibration").className = "px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                document.getElementById("badge-vibration").innerText = "BÌNH THƯỜNG";
+                document.getElementById("val-vibration").className = "font-bold text-emerald-400 text-base";
+                document.getElementById("val-vibration").innerText = "0 (Ổn định)";
+            } else if (type === 'sos') {
+                document.getElementById("card-sos").className = "bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-xl transition-all duration-300 md:col-span-2";
+                document.getElementById("badge-sos").className = "px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                document.getElementById("badge-sos").innerText = "SẴN SÀNG";
+                document.getElementById("val-sos").className = "font-bold text-emerald-400 text-base";
+                document.getElementById("val-sos").innerText = "Không có yêu cầu";
+            }
+        }
+
+        // Lắng nghe dữ liệu từ Firebase Realtime Database
+        const alertRef = ref(db, 'disaster_alert');
+        
+        onValue(alertRef, (snapshot) => {
+            const data = snapshot.val();
+            const sysStatus = document.getElementById("system-status");
+            sysStatus.innerHTML = `<span class="w-3 h-3 rounded-full bg-emerald-500"></span><span class="text-emerald-400">Đã kết nối trực tuyến</span>`;
+
+            if (!data) return;
+
+            // 1. Cảm biến Khói (0 = Cháy rừng)
+            const smokeVal = data.smoke_sensor ?? 1;
+            const smokeCard = document.getElementById("card-smoke");
+            const smokeBadge = document.getElementById("badge-smoke");
+            const smokeText = document.getElementById("val-smoke");
+
+            if (smokeVal === 0) {
+                alarmLocked = true; 
+                smokeCard.className = "bg-red-950/40 border border-red-500 rounded-2xl p-6 shadow-xl shadow-red-900/20 transition-all duration-300 animate-pulse";
+                smokeBadge.className = "px-3 py-1 rounded-full text-xs font-semibold bg-red-500 text-white shadow";
+                smokeBadge.innerText = "⚠️ CẢNH BÁO CHÁY RỪNG";
+                smokeText.className = "font-bold text-red-400 text-base";
+                smokeText.innerText = "0 (PHÁT HIỆN KHÓI!)";
+                addLog("Phát hiện khói nghi ngờ cháy rừng!", "warning");
+            }
+
+            // 2. Cảm biến Rung (1 = Sạt lở)
+            const vibVal = data.vibration_sensor ?? 0;
+            const vibCard = document.getElementById("card-vibration");
+            const vibBadge = document.getElementById("badge-vibration");
+            const vibText = document.getElementById("val-vibration");
+
+            if (vibVal === 1) {
+                alarmLocked = true; 
+                vibCard.className = "bg-red-950/40 border border-red-500 rounded-2xl p-6 shadow-xl shadow-red-900/20 transition-all duration-300 animate-pulse";
+                vibBadge.className = "px-3 py-1 rounded-full text-xs font-semibold bg-red-500 text-white shadow";
+                vibBadge.innerText = "⚠️ CẢNH BÁO SẠT LỞ";
+                vibText.className = "font-bold text-red-400 text-base";
+                vibText.innerText = "1 (RUNG LẮC MẠNH!)";
+                addLog("Phát hiện rung lắc nguy cơ sạt lở đất!", "warning");
+            }
+
+            // 3. Nút SOS (1 = Khẩn cấp)
+            const sosVal = data.sos_button ?? 0;
+            const sosCard = document.getElementById("card-sos");
+            const sosBadge = document.getElementById("badge-sos");
+            const sosText = document.getElementById("val-sos");
+
+            if (sosVal === 1) {
+                alarmLocked = true; 
+                sosCard.className = "bg-red-950/40 border border-red-500 rounded-2xl p-6 shadow-xl shadow-red-900/20 transition-all duration-300 md:col-span-2 animate-pulse";
+                sosBadge.className = "px-3 py-1 rounded-full text-xs font-semibold bg-red-500 text-white shadow";
+                sosBadge.innerText = "🚨 YÊU CẦU CỨU HỘ KHẨN CẤP";
+                sosText.className = "font-bold text-red-400 text-base";
+                sosText.innerText = "1 (ĐÃ KÍCH HOẠT SOS!)";
+                addLog("🚨 KÍCH HOẠT SOS CỨU HỘ TAI NẠN GIAO THÔNG!", "danger");
+            }
+
+            // Kích hoạt còi xe cứu hỏa nếu hệ thống bị khóa do sự cố
+            if (alarmLocked) {
+                if (!isAlarmActive) {
+                    isAlarmActive = true;
+                    startFireSiren();
+                }
+            }
+        }, (error) => {
+            console.error(error);
+            const sysStatus = document.getElementById("system-status");
+            sysStatus.innerHTML = `<span class="w-3 h-3 rounded-full bg-red-500"></span><span class="text-red-400">Lỗi kết nối Firebase</span>`;
+            addLog("Lỗi đọc dữ liệu từ Firebase Realtime Database.", "danger");
+        });
+    </script>
+</body>
+</html>
